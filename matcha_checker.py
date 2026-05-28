@@ -17,7 +17,7 @@ def send_telegram_message(message):
         print(f"Failed to send: {e}")
 
 def check_stock():
-    url = "https://www.marukyu-koyamaen.co.jp/english/shop/products/catalog/matcha/principal"
+    url = "https://www.marukyu-koyamaen.co.jp/english/shop/products/1171020c1"
     with sync_playwright() as p:
         browser = p.chromium.launch()
         page = browser.new_page()
