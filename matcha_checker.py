@@ -5,7 +5,7 @@ from playwright.sync_api import sync_playwright
 
 def send_telegram_message(message):
     token = os.environ.get("TELEGRAM_BOT_TOKEN")
-    chat_id = "8784932445"
+    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
     if not token:
         print("Error: TELEGRAM_BOT_TOKEN not found.")
         return
