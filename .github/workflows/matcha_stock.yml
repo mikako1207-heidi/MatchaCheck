@@ -21,4 +21,4 @@ jobs:
       - name: Run script
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        run: python3 scripts/matcha_checker.py
+        run: python3 matcha_checker.py
