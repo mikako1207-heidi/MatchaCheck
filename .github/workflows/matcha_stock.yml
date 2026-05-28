@@ -1,7 +1,7 @@
 name: Matcha Stock Monitor
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0/30 * * * *'
   workflow_dispatch:
 
 jobs:
