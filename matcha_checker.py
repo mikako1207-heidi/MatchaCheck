@@ -37,11 +37,15 @@ def check_stock():
         for url in urls:
             print(f"Checking: {url}")
             try:
-                # 每個網頁獨立載入，逾時設為 60 秒
-                page.goto(url, wait_until="networkidle", timeout=60000)
+                # 1. 將等待條件改為 'domcontentloaded' (只要 HTML 結構載入完就繼續，不等圖片廣告)
+                page.goto(url, wait_until="domcontentloaded", timeout=30000)
+                
+                # 2. 額外強制等待 3 秒，讓 JavaScript 有時間把庫存文字渲染出來
+                page.wait_for_timeout(3000)
+                
                 content = page.content()
 
-                # 補貨檢查邏輯：如果同時沒有 "Sold out" 且沒有 "Out of stock"
+                # 補貨檢查邏輯
                 if "Sold out" not in content and "Out of stock" not in content:
                     send_telegram_message(f"補貨通知：網頁顯示可能已補貨！請儘速確認：{url}")
                     print(f"Stock detected for {url}! Notification sent.")
