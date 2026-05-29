@@ -37,25 +37,29 @@ def check_stock():
         for url in urls:
             print(f"Checking: {url}")
             try:
-                # 1. 將等待條件改為 'domcontentloaded' (只要 HTML 結構載入完就繼續，不等圖片廣告)
+                # 1. 載入網頁
                 page.goto(url, wait_until="domcontentloaded", timeout=30000)
                 
-                # 2. 額外強制等待 3 秒，讓 JavaScript 有時間把庫存文字渲染出來
-                page.wait_for_timeout(3000)
+                # 2. 精準等待主商品的庫存文字區塊出現（畫面上那一行的 class 通常是產品的購物資訊）
+                # 我們直接定位包含 "out of stock" 或購物車按鈕的區域
+                page.wait_for_timeout(3000) 
                 
-                content = page.content()
+                # 3. 抓取「主商品描述與價格區域」的文字，排除下方推薦商品的干擾
+                # 這裡使用丸久小山園主內容的 selector：.product-short-description 或 #product-detail
+                # 為了保險，我們直接抓取前半段主要核心區塊
+                main_content = page.locator("id=content").inner_text()
 
-                # 補貨檢查邏輯
-                if "Sold out" not in content and "Out of stock" not in content:
+                # 4. 新的精準判斷邏輯
+                # 如果主視覺區塊明確寫著 "out of stock" 或 "sold out"，那就是真的沒貨
+                if "out of stock" in main_content.lower() or "sold out" in main_content.lower():
+                    print(f"URL {url[-9:]} is still out of stock. (Confirmed)")
+                else:
+                    # 如果這兩個詞都沒出現在主商品區，代表可能真的轉成可以購買的按鈕了！
                     send_telegram_message(f"補貨通知：網頁顯示可能已補貨！請儘速確認：{url}")
                     print(f"Stock detected for {url}! Notification sent.")
-                else:
-                    print(f"URL {url[-9:]} is still out of stock.")
                     
             except Exception as e:
                 print(f"Error checking {url}: {e}")
-                
-        browser.close()
 
 if __name__ == "__main__":
     check_stock()
